@@ -1,0 +1,13 @@
+{
+  "name": "transparency-setting",
+  "main": "./lib/transparency-setting",
+  "version": "1.0.0",
+  "description": "Add transparency settings for Inkdrop",
+  "keywords": [],
+  "repository": "https://github.com/ban367/inkdrop-transparency-setting",
+  "license": "MIT",
+  "engines": {
+    "inkdrop": "^4.x"
+  },
+  "dependencies": {}
+}

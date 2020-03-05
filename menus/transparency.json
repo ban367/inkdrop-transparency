@@ -4,15 +4,15 @@
       "label": "Plugins",
       "submenu": [
         {
-          "label": "Transparency Setting",
+          "label": "Transparency",
           "submenu": [
             {
               "label": "Activate",
-              "command": "transparency-setting:active"
+              "command": "transparency:active"
             },
             {
               "label": "Deactivate",
-              "command": "transparency-setting:deactive"
+              "command": "transparency:deactive"
             }
           ]
         }

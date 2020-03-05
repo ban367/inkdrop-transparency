@@ -1,6 +1,6 @@
 # inkdrop-transparency-setting
 
-![Preferences](docs/preferences.png)
+![Preferences](https://raw.githubusercontent.com/ban367/inkdrop-transparency-setting/master/docs/preferences.png)
 
 A plugin for transparency setting used in [Inkdrop](https://www.inkdrop.app/).
 

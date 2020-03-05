@@ -1,0 +1,22 @@
+{
+  "menu": [
+    {
+      "label": "Plugins",
+      "submenu": [
+        {
+          "label": "Transparency Setting",
+          "submenu": [
+            {
+              "label": "Activate",
+              "command": "transparency-setting:active"
+            },
+            {
+              "label": "Deactivate",
+              "command": "transparency-setting:deactive"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

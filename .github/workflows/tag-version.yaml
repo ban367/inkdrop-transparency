@@ -1,0 +1,70 @@
+# vX.X.X形式のプルリクエストのタイトルの場合に同名のタグを先頭コミットに付加する
+name: Create version tag
+
+on:
+  pull_request:
+    branches:
+      - "main"
+    types:
+      - "closed"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: create version tag
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: validate version format
+        id: validate
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const title = context.payload.pull_request.title.trim();
+            const versionPattern = /^v\d+\.\d+\.\d+$/;
+
+            if (!versionPattern.test(title)) {
+              console.log(`PRタイトル "${title}" がバージョン形式(v1.0.0)ではないため、タグ作成をスキップします。`);
+              return 'skip';
+            }
+
+            console.log(`PRタイトル "${title}" はバージョン形式です。タグ作成を続行します。`);
+            return 'continue';
+      - uses: actions/github-script@v7
+        id: set-target-branch
+        if: steps.validate.outputs.result == 'continue'
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const pull_request = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            })
+            return pull_request.data.head.ref
+      - uses: actions/checkout@v5
+        if: steps.validate.outputs.result == 'continue'
+        with:
+          ref: ${{ steps.set-target-branch.outputs.result }}
+      - name: create tag
+        if: steps.validate.outputs.result == 'continue'
+        uses: actions/github-script@v7
+        env:
+          TAG_NAME: ${{github.event.pull_request.title}}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const tagName = process.env.TAG_NAME.trim();
+            console.log(`バージョンタグ "${tagName}" を作成します。`);
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${tagName}`,
+              sha: github.event.pull_request.head.sha
+            });

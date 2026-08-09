@@ -1,0 +1,26 @@
+name: Actions Lint
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      checks: "write"
+      contents: "read"
+      pull-requests: "write"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: reviewdog/action-actionlint@v1
+        with:
+          filter_mode: nofilter
+          level: error
+          reporter: github-pr-review

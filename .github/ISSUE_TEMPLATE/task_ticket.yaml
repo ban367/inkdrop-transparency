@@ -1,0 +1,44 @@
+name: Task Ticket
+description: 新規タスクチケットの作成
+title: ""
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的
+      description: 本チケットにおける目的を教えてください。
+    validations:
+      required: true
+  - type: textarea
+    id: implement
+    attributes:
+      label: 実装想定
+      description: どのように実装するかを教えてください。
+    validations:
+      required: false
+  - type: textarea
+    id: deadline
+    attributes:
+      label: 期限
+      description: 期限を教えてください。
+    validations:
+      required: true
+  - type: textarea
+    id: completion-conditions
+    attributes:
+      label: 完了条件
+      description: 完了条件を教えてください。
+      value: |
+        - [ ] (例)変更される仕様についてREADMEを更新する
+        - [ ] (例)以下の仕様を満たしている
+          - 画像がアップロードできる
+          - 1MB以上の画像はアップロードされない
+          - etc
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: 備考
+      description: 補足についてなにかあれば教えてください。

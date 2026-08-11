@@ -1,0 +1,45 @@
+name: Bug report
+description: 不具合報告
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 概要
+      description: 発生した問題について教えてください。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 再現手順
+      description: なるべく詳細にご記入ください。
+      value: |
+        1. Aに移動
+        2. Bをクリック
+        3. ...
+    validations:
+      required: false
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 期待した動作
+      description: その機能の想定される動作を教えてください。
+    validations:
+      required: false
+  - type: dropdown
+    id: version
+    attributes:
+      label: 実行環境
+      options:
+        - 本番環境
+        - ステージング環境
+        - 開発環境
+        - ローカル環境
+    validations:
+      required: false
+  - type: textarea
+    id: other
+    attributes:
+      label: その他

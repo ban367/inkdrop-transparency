@@ -12,28 +12,28 @@ ipm install transparency
 
 ## Init
 
-### Claude Code 設定
+### Claude Code setup
 
-Anthropic 公式のスキルを利用するため、Claude Code にて以下を実行しておく。
+Run the following in Claude Code to make Anthropic's official skills available.
 
 ```sh
 /plugin marketplace add anthropics/skills
 ```
 
-## リリースフロー
+## Release flow
 
-バージョンタグは GitHub Actions で自動生成されます。
+Version tags are created automatically by GitHub Actions.
 
-1. リリース用ブランチを作成し、`package.json` / `package-lock.json` のバージョンを更新してコミットする
-2. main ブランチへの PR を作成し、**タイトルを `vX.X.X` 形式**（例: `v1.2.3`）にする
-3. PR をマージすると、`tag-version.yaml` ワークフローがそのコミットに同名タグを自動付与する
+1. Create a release branch and bump `version` in `package.json` / `package-lock.json`
+2. Open a pull request against `main` with a **title in `vX.X.X` format** (e.g. `v1.2.3`)
+3. Merging the pull request runs the `tag-version.yaml` workflow, which tags that commit with the same name
 
-> タイトルが `vX.X.X` 形式でない PR をマージしてもタグは作成されません。
+> No tag is created when the merged pull request's title is not in `vX.X.X` format.
 
 ## Changelog
 
 See the [GitHub releases](https://github.com/ban367/inkdrop-transparency/releases) for an overview of what changed in each update.
 
-## 詳細ドキュメント
+## Documentation
 
-- [Design Doc](docs/design-doc.md) - 設計ドキュメントのエントリポイント
+- [Design Doc](docs/design-doc.md) - Entry point for the design documents (written in Japanese)

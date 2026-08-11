@@ -30,13 +30,19 @@
 │   └── preferences.png        # README 用のスクリーンショット
 ├── .github/
 │   ├── workflows/             # GitHub Actions
+│   ├── scripts/
+│   │   └── publish.mjs        # レジストリ公開スクリプト（CIから実行）
 │   ├── ISSUE_TEMPLATE/
 │   └── pull_request_template.md
-└── package.json               # プラグインのメタデータ・バージョン
+└── package.json               # プラグインのメタデータ・バージョン・配布対象
 ```
 
 - `lib/` `keymaps/` `menus/` のディレクトリ名は Inkdrop の規約で固定されている
 - ファイル名はプラグイン名 `transparency` に揃える
+- 配布対象は `package.json` の `files` で `lib` / `keymaps` / `menus` に限定している。
+  指定しない場合、`ipm publish` は denylist（`node_modules` / `.git` 等）を除く
+  ディレクトリ全体を tarball 化するため、`docs/` や `.github/` まで利用者に配布されてしまう
+  （`package.json` / `README*` / `LICENSE*` / `main` のエントリポイントは常に含まれる）
 
 ### コーディング規約（機能固有）
 
@@ -64,6 +70,32 @@
 
 ### リリース手順
 
-1. `package.json` / `package-lock.json` の `version` を更新する
-2. main ブランチへの PR をタイトル `vX.X.X` で作成する
-3. マージすると `.github/workflows/tag-version.yaml` が同名タグを自動付与する
+タグの作成を起点に `.github/workflows/release.yaml` が自動実行される。
+
+1. `package.json` / `package-lock.json` の `version` を更新する PR を main にマージする
+2. オーナーがマージコミットに `vX.X.X` のタグを作成して push する
+3. ワークフローが以下を順に実行する
+   1. タグ名と `package.json` の `version` の一致を検証（不一致なら失敗して以降を実行しない）
+   2. `@inkdropapp/ipm` でレジストリへ公開
+   3. `gh release create --generate-notes` で GitHub Release を作成
+
+`workflow_dispatch` でタグを指定すると dry-run のみを実行でき、
+レジストリへ反映せずに認証情報とパッケージ内容を検証できる。
+
+#### 前提となるリポジトリ設定
+
+| 種別    | 名前                          | 用途                                        |
+| ------- | ----------------------------- | ------------------------------------------- |
+| Secret  | `INKDROP_ACCESS_KEY_ID`       | レジストリ認証（Inkdrop のアクセスキー）    |
+| Secret  | `INKDROP_SECRET_ACCESS_KEY`   | レジストリ認証（同上）                      |
+| Ruleset | タグ `v*` の Restrict creations | タグ作成をオーナーのみに制限                |
+
+アクセスキーは Inkdrop アプリの `application:display-access-key` コマンドで表示できる。
+
+#### 公開処理を CLI ではなくライブラリから呼ぶ理由
+
+`@inkdropapp/ipm-cli` の `ipm publish` は実行前に OS キーリングを参照し、
+未設定の場合は対話的な設定フロー（デスクトップアプリの起動と stdin 入力）に入るため CI では利用できない。
+ライブラリ `@inkdropapp/ipm` は環境変数
+`INKDROP_ACCESS_KEY_ID` / `INKDROP_SECRET_ACCESS_KEY` を優先して読むため、
+`.github/scripts/publish.mjs` から直接呼び出している。

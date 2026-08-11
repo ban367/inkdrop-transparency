@@ -4,6 +4,11 @@
   "version": "1.2.4",
   "description": "Add transparency settings for Inkdrop",
   "keywords": [],
+  "files": [
+    "lib",
+    "keymaps",
+    "menus"
+  ],
   "repository": "https://github.com/ban367/inkdrop-transparency",
   "license": "MIT",
   "engines": {

@@ -46,10 +46,61 @@
 
 ---
 
+### 代替案4: PR タイトルからタグを自動生成する（テンプレートの `tag-version.yaml`）
+
+**概要**: main への PR タイトルが `vX.X.X` 形式のときに、ワークフローが同名タグを自動付与する。
+
+**メリット**:
+- タグの打ち忘れ・打ち間違いが起きない
+- テンプレート (ban367/template) と構成が揃う
+
+**デメリット・不採用理由**:
+- `GITHUB_TOKEN` で作成・push されたタグは他のワークフローを起動しない（GitHub の再帰実行防止仕様）ため、
+  `on: push: tags` のリリースワークフローが発火しない
+- タグ作成をオーナーのみに制限する ruleset と両立しない（bot が弾かれる）
+- リリースの起点が「PR のマージ」と「タグ」の2箇所に分かれ、責任の所在が曖昧になる
+
+テンプレート由来の構成だが、本リポジトリのリリース要件と両立しないため削除した。
+
+---
+
+### 代替案5: CI で `ipm publish` (CLI) をそのまま実行する
+
+**概要**: `@inkdropapp/ipm-cli` をインストールし、ワークフローから `ipm publish` を実行する。
+
+**メリット**:
+- ローカルでの手順とコマンドが完全に一致する
+- 独自スクリプトを持たなくて済む
+
+**デメリット・不採用理由**:
+- CLI は認証情報を OS キーリングからのみ読み、未設定だと対話的な設定フローに入るため CI で停止する
+- キーリングを CI 上で用意する回避策は、ランナー環境に依存し壊れやすい
+- ライブラリ `@inkdropapp/ipm` は環境変数の認証情報を優先するため、
+  数行のスクリプトから呼ぶだけで CI 要件を満たせる
+
+---
+
+### 代替案6: リリース成果物を GitHub Release のみとする
+
+**概要**: タグ契機で GitHub Release だけを作成し、レジストリへの公開は従来どおり手元で行う。
+
+**メリット**:
+- Secrets の管理が不要で、認証情報の漏洩リスクを持ち込まない
+- ワークフローが単純
+
+**デメリット・不採用理由**:
+- 利用者は `ipm install transparency` で導入するため、
+  GitHub Release を作ってもレジストリには何も反映されず、リリースが自動化されたことにならない
+- 「タグ = 公開済み」という不変条件が保てず、公開漏れに気付けない
+
+---
+
 ## 10. 参考資料
 
 ### 外部ドキュメント
 
+- [inkdropapp/ipm](https://github.com/inkdropapp/ipm) - `publish` の実装（tarball 化とレジストリ登録のみで git 操作は行わない）と環境変数による認証
+- [inkdropapp/ipm-cli](https://github.com/inkdropapp/ipm-cli) - CLI の認証フロー（キーリング参照）と `files` allowlist の仕様
 - [Inkdrop Plugin Docs](https://developer.inkdrop.app/) - プラグイン API・ディレクトリ規約
 - [Inkdrop Plugin: Configuration](https://developer.inkdrop.app/guides/config) - `config` スキーマの定義方法
 - [Electron BrowserWindow.setOpacity](https://www.electronjs.org/docs/latest/api/browser-window#winsetopacityopacity-windows-macos) - `inkdrop.window.setOpacity()` の基盤 API

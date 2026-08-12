@@ -17,9 +17,9 @@ ipm install transparency
 
 ## Usage
 
-Set a value between 40 and 100 in the plugin settings. It scales Inkdrop's own acrylic background opacity: **100 looks exactly like Inkdrop with the plugin off, and lower values make the window more see-through.** Transparency is applied to the main window on startup, and a changed value is picked up when you return to the main window.
+Set a value between 40 and 100 in the plugin settings — the window opacity in percent, where 100 is fully opaque. Transparency is applied to the main window on startup, and a changed value is picked up when you return to the main window.
 
-Note that only backgrounds become transparent — text and icons stay opaque — and macOS draws the acrylic window as a blurred material rather than a clear view of whatever is behind it.
+Note that macOS draws the acrylic window as a blurred material, so what shows through is a frosted backdrop rather than a clear view of whatever is behind it.
 
 | Action | Keymap | Menu |
 | --- | --- | --- |

@@ -43,7 +43,10 @@ CLI は `npm install -g @inkdropapp/ipm-cli` で導入する。
 
 ## 設計方針
 
-- 依存パッケージを持たず、Inkdrop が提供する API (`inkdrop.config` / `inkdrop.commands` / `inkdrop.window`) のみを使用する
+- 依存パッケージを持たず、Inkdrop が提供する API (`inkdrop.config` / `inkdrop.commands` / `inkdrop.styles` / `inkdrop.notifications`) のみを使用する
+- Inkdrop 6 には `inkdrop.window.setOpacity()` が存在しない。透過は acrylic ウィンドウの背景色変数を
+  スタイルシートで上書きして実現する。利用可能な API は `@inkdropapp/types` で確認する
+- `lib/` は CommonJS で記述する（`global.require()` で読み込まれるため）
 - 機能は「透過度の設定」と「有効化／無効化」に限定し、過剰な機能追加を避ける
 - 透過度の値は設定 (`transparency.transparencySetting`) を単一の情報源とし、内部状態を持たない
 

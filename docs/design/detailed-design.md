@@ -8,18 +8,18 @@
 
 プラグインが保持する永続データは Inkdrop の設定値 1 つのみで、内部状態は持たない。
 
-```javascript
-// lib/transparency.js
-export const config = {
-  transparencySetting: {
-    title: 'Transparency',
-    description: 'Can be set with a number from 40 to 100',
-    type: 'number',
-    default: 85,
-    minimum: 40,
-    maximum: 100
+```json
+// package.json
+"configSchema": {
+  "transparencySetting": {
+    "title": "Transparency",
+    "description": "Window opacity in percent, from 40 to 100. ...",
+    "type": "number",
+    "default": 85,
+    "minimum": 40,
+    "maximum": 100
   }
-};
+}
 ```
 
 | 設定キー                            | 型     | 既定値 | 範囲   | 説明                                     |
@@ -27,6 +27,17 @@ export const config = {
 | `transparency.transparencySetting`  | number | 85     | 40〜100 | ウィンドウの不透明度（%）。100 で不透明 |
 
 > 下限を 40 としているのは、透過しすぎてウィンドウの視認・操作が困難になることを防ぐため。
+
+**スキーマは `package.json` の `configSchema` で宣言しなければならない。**
+メインモジュールから `config` をエクスポートする方式もあるが、Inkdrop 6 では登録経路が異なる。
+
+| 宣言方法                        | 登録するメソッド                      | 呼ばれるタイミング |
+| ------------------------------- | ------------------------------------- | ------------------ |
+| `package.json` の `configSchema`| `registerConfigSchemaFromMetadata()`  | `preload()` / `load()` |
+| メインモジュールの `config`     | `registerConfigSchemaFromMainModule()`| `activateNow()`    |
+
+設定画面は別ウィンドウでプラグインを `loadPackage` するだけで activate しないため、
+後者では設定項目が設定画面に表示されない。
 
 ### API設計
 

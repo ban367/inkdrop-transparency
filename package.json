@@ -9,6 +9,16 @@
     "keymaps",
     "menus"
   ],
+  "configSchema": {
+    "transparencySetting": {
+      "title": "Transparency",
+      "description": "Window opacity in percent, from 40 to 100. 100 is fully opaque. Requires \"Acrylic Window\" to be enabled.",
+      "type": "number",
+      "default": 85,
+      "minimum": 40,
+      "maximum": 100
+    }
+  },
   "repository": "https://github.com/ban367/inkdrop-transparency",
   "license": "MIT",
   "engines": {

@@ -28,7 +28,7 @@ jobs:
       TAG_NAME: ${{ inputs.tag || github.ref_name }}
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref_name }}
 
@@ -41,9 +41,9 @@ jobs:
           fi
           echo "バージョン ${pkg_version} を確認しました。"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: install the package manager library
         run: npm install --no-save @inkdropapp/ipm@^1.1.3

@@ -18,7 +18,7 @@ jobs:
       contents: "read"
       pull-requests: "write"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: reviewdog/action-actionlint@v1
         with:
           filter_mode: nofilter

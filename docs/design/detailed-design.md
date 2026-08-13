@@ -11,21 +11,26 @@
 ```json
 // package.json
 "configSchema": {
-  "sidebarOpacity":  { "type": "number", "default": 100, "minimum": 0, "maximum": 200 },
-  "noteListOpacity": { "type": "number", "default": 100, "minimum": 0, "maximum": 200 },
-  "editorOpacity":   { "type": "number", "default": 100, "minimum": 0, "maximum": 200 },
+  "sidebarOpacity":  { "type": "number", "default": 40,  "minimum": 0, "maximum": 200 },
+  "noteListOpacity": { "type": "number", "default": 40,  "minimum": 0, "maximum": 200 },
+  "editorOpacity":   { "type": "number", "default": 40,  "minimum": 0, "maximum": 200 },
   "menuOpacity":     { "type": "number", "default": 100, "minimum": 0, "maximum": 200 }
 }
 ```
 
 | 設定キー                          | 対象領域                             | 既定値 | 範囲   |
 | --------------------------------- | ------------------------------------ | ------ | ------ |
-| `transparency.sidebarOpacity`     | サイドバー                           | 100    | 0〜200 |
-| `transparency.noteListOpacity`    | ノート一覧                           | 100    | 0〜200 |
-| `transparency.editorOpacity`      | エディタ領域                         | 100    | 0〜200 |
+| `transparency.sidebarOpacity`     | サイドバー                           | 40     | 0〜200 |
+| `transparency.noteListOpacity`    | ノート一覧                           | 40     | 0〜200 |
+| `transparency.editorOpacity`      | エディタ領域                         | 40     | 0〜200 |
 | `transparency.menuOpacity`        | メニュー・ドロップダウン・ドロワー   | 100    | 0〜200 |
 
-いずれも **Inkdrop 既定の不透明度に対する倍率（%）** であり、100 で Inkdrop 既定と完全に一致する。
+いずれも **Inkdrop 既定の不透明度に対する倍率（%）** であり、100 で Inkdrop 既定と完全に一致する
+（＝透過を追加しない）。値を下げるほど Inkdrop 既定より透過が強くなる。
+
+主要3領域の既定を 40 としているのは、実機で確認した結果 100 付近では体感的な変化が乏しく、
+40 前後でようやく「透過が効いている」と感じられたため。メニュー類は Inkdrop が可読性のため
+不透明にしており、既定では透過を追加しない。
 
 **倍率として持つ理由。** Inkdrop の既定値は領域ごとにもライト／ダークごとにも大きく異なる
 （サイドバーはライト 2% / ダーク 10%、ノート一覧はライト 80% / ダーク 50%）。
@@ -87,6 +92,7 @@ Inkdrop のコマンドがプラグインの公開インターフェースとな
 
 | コマンド                 | 説明                                                    |
 | ------------------------ | ------------------------------------------------------- |
+| `transparency:toggle`    | 適用状態を反転する                                      |
 | `transparency:active`    | 設定値からスタイルシートを生成して適用する              |
 | `transparency:deactive`  | スタイルシートを外し Inkdrop 既定の見た目に戻す         |
 
@@ -96,8 +102,7 @@ Inkdrop のコマンドがプラグインの公開インターフェースとな
 
 | キー               | コマンド                |
 | ------------------ | ----------------------- |
-| `ctrl-alt-cmd-t`   | `transparency:active`   |
-| `alt-cmd-t`        | `transparency:deactive` |
+| `ctrl-alt-cmd-t`   | `transparency:toggle`   |
 
 > `cmd-t` は Inkdrop 6 で `core:choose-template` に割り当て済みのため使用しない。
 
@@ -107,17 +112,36 @@ Inkdrop のコマンドがプラグインの公開インターフェースとな
 
 | ラベル       | コマンド                |
 | ------------ | ----------------------- |
+| `Toggle`     | `transparency:toggle`   |
 | `Activate`   | `transparency:active`   |
 | `Deactivate` | `transparency:deactive` |
+
+#### ツールバー
+
+`editor-toolbar` レイアウトに `TransparencyToolbarButton` を登録する。
+このレイアウトは Inkdrop 本体では空で、エディタのツールバー右端に描画される。
+
+- `inkdrop.components.registerClass()` でコンポーネントを登録し、
+  `inkdrop.layouts.addComponentToLayout()` でレイアウトに追加する
+- React は Inkdrop がバンドルしており、`Module._nodeModulePaths` のパッチにより
+  プラグインからも `require('react')` で解決できる。ビルド構成を持たないため JSX は使わず
+  `React.createElement()` で記述する
+- 見た目は本体のツールバー項目と同じ `mde-toolbar-item` / `focus-outline` クラスで揃え、
+  適用中は `active` クラスを付ける
+- アイコンは本体のアイコン機構に依存せずインライン SVG で持つ
+- `mousedown` を抑止し、ボタン操作でエディタのフォーカスを奪わない
+- エディタのツールバーは `localConfig.editor.toolbarHidden` で非表示にできる。
+  その場合はボタンも出ないため、キーマップとメニューを代替手段として残している
 
 ### 処理ロジック
 
 #### `activate()`
 
-1. `inkdrop.commands.add(document.body, ...)` で `transparency:active` / `transparency:deactive` を登録する
-2. 設定キー4つそれぞれに `inkdrop.config.onDidChange()` を登録する
-3. `inkdrop.window.onFocus()` を登録する
-4. `inkdrop.isMainWindow` が真の場合のみ、起動直後に適用する
+1. `inkdrop.commands.add(document.body, ...)` で `toggle` / `active` / `deactive` を登録する
+2. ツールバーのコンポーネントを登録し、`editor-toolbar` レイアウトに追加する
+3. 設定キー4つそれぞれに `inkdrop.config.onDidChange()` を登録する
+4. `inkdrop.window.onFocus()` を登録する
+5. `inkdrop.isMainWindow` が真の場合のみ、起動直後に適用する
    - サブウィンドウまで対象にしないための条件分岐
 
 設定画面は `windowType: 'preferences'` の**別ウィンドウ**として開かれ、そこではプラグインは
@@ -131,9 +155,22 @@ Inkdrop のコマンドがプラグインの公開インターフェースとな
 既存のスタイルシートを破棄してから、設定値をもとに生成したスタイルシートを追加する。
 戻り値の Disposable をモジュール変数に保持し、これが `null` かどうかで適用中の判定を兼ねる。
 
+#### `transparency:toggle`
+
+適用中なら解除し、そうでなければ適用する。
+適用状態はスタイルシートの Disposable の有無で判定するため、独自の状態変数を持たない。
+
+#### 適用状態の通知
+
+ツールバーのボタンは適用状態に応じて `active` クラスを付け外しする必要がある。
+`event-kit` に依存せず、モジュール内の `Set` に購読関数を保持し、
+適用・解除のたびに呼び出す最小限の仕組みで実現する。
+ボタン側は `useEffect` で購読・解除する。
+
 #### `deactivate()`
 
-スタイルシートを dispose し、`activate()` で登録した購読をすべて解除する。
+ツールバーからコンポーネントを取り除いて登録を解除し、スタイルシートを dispose し、
+`activate()` で登録した購読をすべて解除する。
 
 ### エラーハンドリング
 
@@ -142,7 +179,7 @@ Inkdrop のコマンドがプラグインの公開インターフェースとな
 | 事象                             | 発生条件                                       | 挙動・対処                                                             |
 | -------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
 | 設定値が範囲外                   | 設定画面で 0〜200 以外を入力                   | Inkdrop の設定スキーマ（`minimum` / `maximum`）が入力段階で弾く         |
-| 設定値が未設定                   | 初回起動時                                     | スキーマの `default: 100` が適用され、Inkdrop 既定と同じ見た目になる    |
+| 設定値が未設定                   | 初回起動時                                     | スキーマの既定値（主要3領域は 40、メニューは 100）が適用される          |
 | 算出結果が 100% を超える         | 倍率を 100 より大きくした場合                  | `Math.min(100, ...)` で丸める                                           |
 | サブウィンドウでの起動時適用     | メインウィンドウ以外でプラグインが読み込まれる | `inkdrop.isMainWindow` の判定により適用しない                           |
 | acrylic が無効                   | `core.mainWindow.acrylicEnabled` が false      | 背景は薄くなるがウィンドウ自体は不透明なため背後は見えない。`inkdrop.notifications.addWarning()` で有効化と再起動を促す |

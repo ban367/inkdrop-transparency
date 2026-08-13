@@ -7,6 +7,10 @@
           "label": "Transparency",
           "submenu": [
             {
+              "label": "Toggle",
+              "command": "transparency:toggle"
+            },
+            {
               "label": "Activate",
               "command": "transparency:active"
             },

@@ -12,31 +12,31 @@
   "configSchema": {
     "sidebarOpacity": {
       "title": "Sidebar opacity",
-      "description": "Percentage of Inkdrop's own acrylic opacity for the sidebar. 100 keeps the Inkdrop default, lower is more see-through, higher is more solid.",
+      "description": "Inkdrop's acrylic window is already slightly see-through; this plugin adds more transparency on top of it. The value is the sidebar's opacity as a percentage of Inkdrop's own: 100 adds nothing, and lower values make it more transparent. Around 40 is a good starting point.",
       "type": "number",
-      "default": 100,
+      "default": 40,
       "minimum": 0,
       "maximum": 200
     },
     "noteListOpacity": {
       "title": "Note list opacity",
-      "description": "Percentage of Inkdrop's own acrylic opacity for the note list. 100 keeps the Inkdrop default.",
+      "description": "The note list's opacity as a percentage of Inkdrop's own. 100 adds no extra transparency, lower adds more.",
       "type": "number",
-      "default": 100,
+      "default": 40,
       "minimum": 0,
       "maximum": 200
     },
     "editorOpacity": {
       "title": "Editor opacity",
-      "description": "Percentage of Inkdrop's own acrylic opacity for the editor area. 100 keeps the Inkdrop default.",
+      "description": "The editor area's opacity as a percentage of Inkdrop's own. 100 adds no extra transparency, lower adds more. Raise this above the others if you want the text you are writing to stay easy to read.",
       "type": "number",
-      "default": 100,
+      "default": 40,
       "minimum": 0,
       "maximum": 200
     },
     "menuOpacity": {
       "title": "Menu and dropdown opacity",
-      "description": "Percentage of the opacity Inkdrop uses for menus, dropdowns and the editor drawer. These are opaque by default so they stay readable; lower this only if you want them translucent too.",
+      "description": "The opacity of menus, dropdowns and the editor drawer, as a percentage of Inkdrop's own. Inkdrop keeps these fully opaque so they stay readable, so the default adds no transparency here; lower it only if you want them translucent too.",
       "type": "number",
       "default": 100,
       "minimum": 0,

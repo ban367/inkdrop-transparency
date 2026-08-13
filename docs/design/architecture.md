@@ -12,9 +12,14 @@ graph TD
     U -->|Plugins メニュー| MN[menus/transparency.json]
     U -->|設定画面で領域ごとの倍率を入力| CFG[(inkdrop.config)]
 
+    U -->|ツールバーのボタン| TB[TransparencyToolbarButton]
     KM -->|コマンド発行| CMD[inkdrop.commands]
     MN -->|コマンド発行| CMD
     CMD --> PLG[lib/transparency.js]
+    TB -->|toggle| PLG
+    PLG -->|適用状態の通知| TB
+    PLG -->|registerClass / addComponentToLayout| CMP[inkdrop.components / inkdrop.layouts]
+    CMP -->|editor-toolbar に描画| TB
 
     CFG -->|4つの倍率設定| PLG
     SCH[package.json の configSchema] -->|load時にスキーマ登録| CFG
@@ -69,3 +74,5 @@ sequenceDiagram
 | `inkdrop.config`            | 倍率設定の保持と変更通知                                       | Inkdrop API                |
 | `inkdrop.styles`            | スタイルシートの追加・削除（Disposable で解除）                | Inkdrop API (StyleManager) |
 | `inkdrop.notifications`     | acrylic 無効時の警告表示                                       | Inkdrop API                |
+| `inkdrop.components` / `inkdrop.layouts` | ツールバーボタンの登録と `editor-toolbar` への配置 | Inkdrop API                |
+| `TransparencyToolbarButton` | ツールバーからの切り替えと適用状態の表示                       | React (バンドル版を `require`) |

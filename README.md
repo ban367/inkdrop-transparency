@@ -4,6 +4,8 @@
 
 This plugin allows you to change [Inkdrop](https://www.inkdrop.app/) window transparency. You can set it in the plugin’s settings.
 
+> **Inkdrop 4 and 5 only.** Inkdrop 6 removed `setOpacity` from its plugin API, and nothing else exposed to plugins can control window transparency, so this plugin cannot work there.
+
 ## Install
 
 ```sh
@@ -22,13 +24,19 @@ Run the following in Claude Code to make Anthropic's official skills available.
 
 ## Release flow
 
-Version tags are created automatically by GitHub Actions.
+Releases are driven by version tags, which only the repository owner can create.
 
-1. Create a release branch and bump `version` in `package.json` / `package-lock.json`
-2. Open a pull request against `main` with a **title in `vX.X.X` format** (e.g. `v1.2.3`)
-3. Merging the pull request runs the `tag-version.yaml` workflow, which tags that commit with the same name
+1. Open a pull request that bumps `version` in `package.json` / `package-lock.json`, and merge it into `main`
+2. Tag the merge commit and push the tag
 
-> No tag is created when the merged pull request's title is not in `vX.X.X` format.
+   ```sh
+   git tag -a v1.2.5 -m "v1.2.5"
+   git push origin v1.2.5
+   ```
+
+3. The `release.yaml` workflow then checks the tag against `package.json`, publishes the plugin to the Inkdrop registry, and creates a GitHub release
+
+> The workflow fails when the tag name does not match the `version` in `package.json`, so no half-released version reaches the registry.
 
 ## Changelog
 

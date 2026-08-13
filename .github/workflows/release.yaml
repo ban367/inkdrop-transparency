@@ -1,0 +1,74 @@
+# vX.X.X形式のタグが付与されたときにレジストリへ公開しGitHub Releaseを作成する
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "dry-runで検証するタグ (例: v1.2.4)"
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: publish to registry and create release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: "write"
+    env:
+      # workflow_dispatchは検証用のためdry-runに限定する
+      TAG_NAME: ${{ inputs.tag || github.ref_name }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # タグ以外を指すことがないよう refs/tags/ を明示する。
+          # 単なる名前で渡すと同名のブランチが優先されうるため、
+          # タグ作成をオーナーに限定していても、ブランチを作れる者が
+          # workflow_dispatch から任意のコードを Secrets 付きで実行できてしまう。
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
+
+      - name: validate tag matches package.json version
+        run: |
+          pkg_version=$(node -p "require('./package.json').version")
+          if [ "$TAG_NAME" != "v${pkg_version}" ]; then
+            echo "::error::タグ ${TAG_NAME} と package.json のバージョン ${pkg_version} が一致しません。"
+            exit 1
+          fi
+          echo "バージョン ${pkg_version} を確認しました。"
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: install the package manager library
+        run: npm install --no-save @inkdropapp/ipm@^1.1.3
+
+      - name: publish to the Inkdrop package registry
+        env:
+          INKDROP_ACCESS_KEY_ID: ${{ secrets.INKDROP_ACCESS_KEY_ID }}
+          INKDROP_SECRET_ACCESS_KEY: ${{ secrets.INKDROP_SECRET_ACCESS_KEY }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            node .github/scripts/publish.mjs --dry-run
+          else
+            node .github/scripts/publish.mjs
+          fi
+
+      - name: create GitHub release
+        if: env.DRY_RUN != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$TAG_NAME" \
+            --title "$TAG_NAME" \
+            --generate-notes \
+            --verify-tag

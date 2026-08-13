@@ -25,9 +25,21 @@ Inkdrop のウィンドウ透過度を設定画面から変更でき、コマン
 ## 開発コマンド
 
 ビルド・テスト・Lint のスクリプトは未設定です（依存パッケージなしの素の JavaScript）。
+CLI は `npm install -g @inkdropapp/ipm-cli` で導入する。
 
-- 動作確認: 本リポジトリを Inkdrop のプラグインディレクトリに配置し、Inkdrop を再起動する
+- 動作確認: `ipm link` で本リポジトリを Inkdrop にリンクし、Inkdrop を再起動する
+- 公開内容の確認: `ipm publish --dry-run`（レジストリには反映されない）
 - 配布: `ipm install transparency`（利用者向け）
+
+## リリース
+
+タグ契機で `.github/workflows/release.yaml` が自動実行される。手順は README の Release flow を参照。
+
+- タグ (`v*`) の作成はリポジトリオーナーのみに ruleset で制限している
+- ワークフローはタグ名と `package.json` の `version` の一致を検証し、不一致なら失敗する
+- レジストリへの公開には Secrets `INKDROP_ACCESS_KEY_ID` / `INKDROP_SECRET_ACCESS_KEY` が必要
+- 配布物は `package.json` の `files` で `lib` / `keymaps` / `menus` に限定している。
+  配布に含めるファイルを増やす場合はここを更新する
 
 ## 設計方針
 

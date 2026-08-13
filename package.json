@@ -1,7 +1,7 @@
 {
   "name": "transparency",
   "main": "./lib/transparency",
-  "version": "1.2.5",
+  "version": "2.0.0",
   "description": "Add transparency settings for Inkdrop",
   "keywords": [],
   "files": [
@@ -9,10 +9,44 @@
     "keymaps",
     "menus"
   ],
+  "configSchema": {
+    "sidebarOpacity": {
+      "title": "Sidebar opacity",
+      "description": "Inkdrop's acrylic window is already slightly see-through; this plugin adds more transparency on top of it. The value is the sidebar's opacity as a percentage of Inkdrop's own: 100 adds nothing, and lower values make it more transparent. Around 40 is a good starting point.",
+      "type": "number",
+      "default": 40,
+      "minimum": 0,
+      "maximum": 100
+    },
+    "noteListOpacity": {
+      "title": "Note list opacity",
+      "description": "The note list's opacity as a percentage of Inkdrop's own. 100 adds no extra transparency, lower adds more.",
+      "type": "number",
+      "default": 40,
+      "minimum": 0,
+      "maximum": 100
+    },
+    "editorOpacity": {
+      "title": "Editor opacity",
+      "description": "The editor area's opacity as a percentage of Inkdrop's own. 100 adds no extra transparency, lower adds more. Keep this higher than the other areas if you want the text you are writing to stay easy to read.",
+      "type": "number",
+      "default": 40,
+      "minimum": 0,
+      "maximum": 100
+    },
+    "menuOpacity": {
+      "title": "Menu and dropdown opacity",
+      "description": "The opacity of menus, dropdowns and the editor drawer, as a percentage of Inkdrop's own. Inkdrop keeps these fully opaque so they stay readable, so the default adds no transparency here; lower it only if you want them translucent too.",
+      "type": "number",
+      "default": 100,
+      "minimum": 0,
+      "maximum": 100
+    }
+  },
   "repository": "https://github.com/ban367/inkdrop-transparency",
   "license": "MIT",
   "engines": {
-    "inkdrop": ">=4.0.0 <6.0.0"
+    "inkdrop": "^6.0.0"
   },
   "dependencies": {}
 }

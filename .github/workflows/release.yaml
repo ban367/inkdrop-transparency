@@ -30,7 +30,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.tag || github.ref_name }}
+          # タグ以外を指すことがないよう refs/tags/ を明示する。
+          # 単なる名前で渡すと同名のブランチが優先されうるため、
+          # タグ作成をオーナーに限定していても、ブランチを作れる者が
+          # workflow_dispatch から任意のコードを Secrets 付きで実行できてしまう。
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
 
       - name: validate tag matches package.json version
         run: |

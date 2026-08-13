@@ -1,7 +1,7 @@
 {
   "name": "transparency",
   "main": "./lib/transparency",
-  "version": "1.2.5",
+  "version": "2.0.0",
   "description": "Add transparency settings for Inkdrop",
   "keywords": [],
   "files": [
@@ -9,10 +9,44 @@
     "keymaps",
     "menus"
   ],
+  "configSchema": {
+    "sidebarOpacity": {
+      "title": "Sidebar opacity",
+      "description": "Percentage of Inkdrop's own acrylic opacity for the sidebar. 100 keeps the Inkdrop default, lower is more see-through, higher is more solid.",
+      "type": "number",
+      "default": 100,
+      "minimum": 0,
+      "maximum": 200
+    },
+    "noteListOpacity": {
+      "title": "Note list opacity",
+      "description": "Percentage of Inkdrop's own acrylic opacity for the note list. 100 keeps the Inkdrop default.",
+      "type": "number",
+      "default": 100,
+      "minimum": 0,
+      "maximum": 200
+    },
+    "editorOpacity": {
+      "title": "Editor opacity",
+      "description": "Percentage of Inkdrop's own acrylic opacity for the editor area. 100 keeps the Inkdrop default.",
+      "type": "number",
+      "default": 100,
+      "minimum": 0,
+      "maximum": 200
+    },
+    "menuOpacity": {
+      "title": "Menu and dropdown opacity",
+      "description": "Percentage of the opacity Inkdrop uses for menus, dropdowns and the editor drawer. These are opaque by default so they stay readable; lower this only if you want them translucent too.",
+      "type": "number",
+      "default": 100,
+      "minimum": 0,
+      "maximum": 200
+    }
+  },
   "repository": "https://github.com/ban367/inkdrop-transparency",
   "license": "MIT",
   "engines": {
-    "inkdrop": ">=4.0.0 <6.0.0"
+    "inkdrop": "^6.0.0"
   },
   "dependencies": {}
 }

@@ -4,18 +4,22 @@
 
 ## 8. 検討した代替案
 
-### 代替案1: CSS によるエディタ領域のみの透過
+### 代替案1: CSS による透過（v1 では不採用、v2 で採用）
 
-**概要**: `styles/` にスタイルシートを追加し、Inkdrop の各 UI 要素の `background-color` を半透明にする。
+**概要**: スタイルシートで Inkdrop の背景色を半透明にする。
 
-**メリット**:
-- エディタ・サイドバーなど領域ごとに透過度を変えられる
-- ウィンドウ枠は不透明のまま保てる
-
-**デメリット・不採用理由**:
+**v1 での不採用理由**:
 - Inkdrop 本体の DOM 構造・クラス名に依存し、本体更新で壊れやすい
 - Electron のウィンドウが不透明なままだと背後が透けず、期待した見た目にならない
 - `inkdrop.window.setOpacity()` を使えば数行で目的を達成できる
+
+**v2 で採用に転じた理由**:
+- Inkdrop 6 で `setOpacity` が削除され、代替手段が存在しない（代替案7 参照）
+- Inkdrop 6 の acrylic ウィンドウは `transparent: true` で生成されるため、
+  「ウィンドウが不透明で背後が透けない」という不採用理由が解消された
+- 背景色が CSS カスタムプロパティ（`--sidebar-background` 等）で定義されており、
+  DOM 構造やクラス名ではなく変数を上書きするだけで済むため、当初懸念した脆さが小さい
+- 領域ごとに調整できるという当初のメリットが、そのまま v2 の価値になった
 
 ---
 
@@ -35,14 +39,14 @@
 
 ### 代替案3: 設定値を 0〜1 の小数で保持する
 
-**概要**: `setOpacity()` の引数をそのまま設定値とする。
+**概要**: 不透明度を 0〜1 の小数で設定させる。v1 では `setOpacity()` の引数にそのまま渡せた。
 
 **メリット**:
-- 変換処理が不要
+- v1 では変換処理が不要だった
 
 **デメリット・不採用理由**:
 - ユーザーにとって「85%」の方が直感的
-- 下限を設けないと 0 に近い値で操作不能になりうるため、いずれにせよ範囲制約は必要
+- v2 では CSS の `%` 表記にそのまま使えるため、パーセント保持の利点がさらに大きい
 
 ---
 
@@ -95,11 +99,11 @@
 
 ---
 
-### 代替案7: Inkdrop 6 に対応する
+### 代替案7: Inkdrop 6 でウィンドウ全体を透過させる（v1 相当の見た目）
 
-**概要**: `engines` を Inkdrop 6 まで広げ、透過を別方式で実装する。
+**概要**: Inkdrop 6 でも v1 と同じく、ウィンドウ全体（文字を含む）を半透明にする。
 
-**不採用理由**: Inkdrop 6.0.0 を実機調査した結果、**プラグインから透過を制御する手段が存在しない**。
+**不採用理由**: Inkdrop 6.0.0 を実機調査した結果、**ウィンドウの不透明度を制御する手段が存在しない**。
 以下はすべて実際のアプリケーション（`app.asar`）と `@inkdropapp/types` で確認した事実。
 
 | 経路                         | 調査結果                                                                 |
@@ -110,9 +114,9 @@
 | vibrancy の無効化            | `setVibrancy` / `setBackgroundMaterial` / `setAlphaValue` すべて 0 件。生成時に一度設定されるのみ |
 | 設定による制御               | `core.mainWindow` のキーは `acrylicEnabled` 等のみで vibrancy に触れられない |
 | acrylic を無効化する         | `transparent: true` は acrylic 分岐の 1 箇所のみ。無効化するとウィンドウが不透明になり透過不能 |
-| CSS で背景を透過させる       | 実装して検証したが、背後は `vibrancy: 'under-window'` のすりガラスとして見えるだけで実用にならなかった |
+| `body` へ `opacity` を掛ける | 文字ごと薄くなり v1 に近い見た目にはなるが、背後は依然ぼやけたままで実用にならなかった |
 
-CSS 方式では、全背景を透明にした状態でも不透明な DOM 要素は 0 個であり、
+全背景を透明にした状態でも不透明な DOM 要素は 0 個であり、
 残るぼかしと明るさは OS が Web コンテンツの背後に合成しているマテリアルであることを確認した。
 つまり DOM 側に手を入れて解決できる余地が無い。
 
@@ -120,10 +124,25 @@ CSS 方式では、全背景を透明にした状態でも不透明な DOM 要�
 Electron の ABI ごとのビルドが必要で、ipm はソース配布かつビルド工程を持たず、
 「依存パッケージを持たない」という本プラグインの方針とも矛盾するため採らない。
 
-検証した実装は `claude/inkdrop6-transparency` ブランチに残している。
-本体に透過制御の API が追加されれば再開できる。
+**この結論を受けて v2 では目的自体を変えた。** ウィンドウ全体の透過は諦め、
+acrylic ウィンドウの透け具合を領域ごとに調整する機能として作り直している。
+ぼかしは変えられないが、どの領域をどれだけ濃く／薄くするかは制御できるためである。
 
 ---
+
+### 代替案8: 領域ごとの不透明度を絶対値で指定させる
+
+**概要**: 設定値をそのまま不透明度（%）として各背景色変数に適用する。
+
+**メリット**:
+- 設定値と見た目が直結し、利用者に分かりやすい
+
+**デメリット・不採用理由**:
+- Inkdrop の既定値は領域ごとにもライト／ダークごとにも大きく異なるため
+  （サイドバー 2% / 10%、ノート一覧 80% / 50%）、1つの値が全領域で妥当になりえない
+- 一律の値で上書きする実装を試したところ、既定 85 が素の acrylic より不透明になり、
+  「設定を上げるほど透けない」という逆転した挙動になった
+- 倍率であれば Inkdrop 側のライト／ダーク調整をそのまま活かせ、100 を既定と一致させられる
 
 ## 10. 参考資料
 
@@ -131,9 +150,11 @@ Electron の ABI ごとのビルドが必要で、ipm はソース配布かつ�
 
 - [inkdropapp/ipm](https://github.com/inkdropapp/ipm) - `publish` の実装（tarball 化とレジストリ登録のみで git 操作は行わない）と環境変数による認証
 - [inkdropapp/ipm-cli](https://github.com/inkdropapp/ipm-cli) - CLI の認証フロー（キーリング参照）と `files` allowlist の仕様
-- [Inkdrop Plugin Docs](https://developer.inkdrop.app/) - プラグイン API・ディレクトリ規約
-- [Inkdrop Plugin: Configuration](https://developer.inkdrop.app/guides/config) - `config` スキーマの定義方法
-- [Electron BrowserWindow.setOpacity](https://www.electronjs.org/docs/latest/api/browser-window#winsetopacityopacity-windows-macos) - `inkdrop.window.setOpacity()` の基盤 API
+- [Inkdrop Plugin Docs](https://developers.inkdrop.app/) - プラグイン API・ディレクトリ規約
+- [@inkdropapp/types](https://www.npmjs.com/package/@inkdropapp/types) - Inkdrop 6 の API 型定義。`IPCWindow` に `setOpacity` が無いことの根拠
+- [CSS Cascade Layers](https://developer.mozilla.org/docs/Web/CSS/@layer) - レイヤーなしの宣言が `@layer` より優先される規則（本体スタイルを上書きする根拠）
+- [CSS light-dark()](https://developer.mozilla.org/docs/Web/CSS/color_value/light-dark) - ライト／ダーク双方の色を1つの宣言で指定する
+- [Electron BrowserWindow.setOpacity](https://www.electronjs.org/docs/latest/api/browser-window#winsetopacityopacity-windows-macos) - v1 が使っていた API。Inkdrop 6 では利用できない
 
 ### 関連リンク
 

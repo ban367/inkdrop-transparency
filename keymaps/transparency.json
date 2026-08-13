@@ -1,6 +1,6 @@
 {
   "body": {
-    "cmd-t": "transparency:active",
+    "ctrl-alt-cmd-t": "transparency:active",
     "alt-cmd-t": "transparency:deactive"
   }
 }

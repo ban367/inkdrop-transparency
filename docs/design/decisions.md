@@ -95,6 +95,36 @@
 
 ---
 
+### 代替案7: Inkdrop 6 に対応する
+
+**概要**: `engines` を Inkdrop 6 まで広げ、透過を別方式で実装する。
+
+**不採用理由**: Inkdrop 6.0.0 を実機調査した結果、**プラグインから透過を制御する手段が存在しない**。
+以下はすべて実際のアプリケーション（`app.asar`）と `@inkdropapp/types` で確認した事実。
+
+| 経路                         | 調査結果                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `inkdrop.window.setOpacity()`| `IPCWindow` の型定義に存在せず、`app.asar` 内の出現も 0 件                |
+| `@electron/remote`           | アプリ内に "@electron/remote is removed in v6" の記述があり利用不可       |
+| IPC 経由での呼び出し         | `window:` チャンネルは 41 個の固定 allowlist。opacity 系も汎用の method 呼び出し口も無い |
+| vibrancy の無効化            | `setVibrancy` / `setBackgroundMaterial` / `setAlphaValue` すべて 0 件。生成時に一度設定されるのみ |
+| 設定による制御               | `core.mainWindow` のキーは `acrylicEnabled` 等のみで vibrancy に触れられない |
+| acrylic を無効化する         | `transparent: true` は acrylic 分岐の 1 箇所のみ。無効化するとウィンドウが不透明になり透過不能 |
+| CSS で背景を透過させる       | 実装して検証したが、背後は `vibrancy: 'under-window'` のすりガラスとして見えるだけで実用にならなかった |
+
+CSS 方式では、全背景を透明にした状態でも不透明な DOM 要素は 0 個であり、
+残るぼかしと明るさは OS が Web コンテンツの背後に合成しているマテリアルであることを確認した。
+つまり DOM 側に手を入れて解決できる余地が無い。
+
+理論上はネイティブアドオンから `NSWindow` を操作する手段が残るが、
+Electron の ABI ごとのビルドが必要で、ipm はソース配布かつビルド工程を持たず、
+「依存パッケージを持たない」という本プラグインの方針とも矛盾するため採らない。
+
+検証した実装は `claude/inkdrop6-transparency` ブランチに残している。
+本体に透過制御の API が追加されれば再開できる。
+
+---
+
 ## 10. 参考資料
 
 ### 外部ドキュメント

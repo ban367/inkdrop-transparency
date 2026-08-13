@@ -12,7 +12,7 @@
   "repository": "https://github.com/ban367/inkdrop-transparency",
   "license": "MIT",
   "engines": {
-    "inkdrop": ">=4.0.0 <7.0.0"
+    "inkdrop": ">=4.0.0 <6.0.0"
   },
   "dependencies": {}
 }

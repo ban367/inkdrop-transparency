@@ -4,6 +4,8 @@
 
 This plugin allows you to change [Inkdrop](https://www.inkdrop.app/) window transparency. You can set it in the plugin’s settings.
 
+> **Inkdrop 4 and 5 only.** Inkdrop 6 removed `setOpacity` from its plugin API, and nothing else exposed to plugins can control window transparency, so this plugin cannot work there.
+
 ## Install
 
 ```sh

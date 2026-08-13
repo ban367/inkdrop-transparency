@@ -75,10 +75,32 @@ Inkdrop 6 には `inkdrop.window.setOpacity()` が存在しない（`@electron/r
 | `--inline-dropdown-menu-background`| ドロップダウン       | `menuOpacity`     | `--hsl-white` 100%     | `--hsl-neutral-900` 100% |
 | `--vertical-menu-background`       | 縦メニュー           | `menuOpacity`     | `--hsl-white` 100%     | `--hsl-neutral-900` 100% |
 
+#### Windows ダークテーマ用の追加ルール
+
+Inkdrop は Windows のダークテーマでのみ、別のセレクタで基準値を上書きしている。
+
+```css
+:root:has(body.acrylic-window[class*='dark-ui'].platform-win32),
+:root:has(body.dark-mode.acrylic-window.platform-win32) {
+  --sidebar-background: hsl(var(--hsl-black) / 20%);
+  --page-background: hsl(var(--hsl-black) / 40%);
+}
+```
+
+同じセレクタで基準値を揃えないと、この環境だけ倍率 100 が Inkdrop 既定と一致しない
+（サイドバーが 20% ではなく 10% になる）。そのため同一のセレクタで2つ目のブロックを出力する。
+
+`--page-background` はウィンドウ全体に敷かれ、各領域の背景はその上に重なる。
+専用の設定項目を増やす代わりに、**3領域のうち最も透過を強くした指定（最小値）に合わせる**。
+下地が利用者の意図より濃くなることがなく、領域ごとの背景は上に重なるため可読性も損なわない。
+
+> Windows の acrylic は `core.mainWindow.acrylicEnabled` の既定が false のため、
+> 利用者が明示的に有効化した場合にのみ関係する。
+
 #### 上書きしない変数
 
-- `--page-background` / `--editor-background-color` — acrylic 時に Inkdrop が `transparent` にしており、
-  倍率をかけても透明のままで調整の余地がない
+- `--page-background`（macOS / Windows ライト）/ `--editor-background-color`
+  — acrylic 時に Inkdrop が `transparent` にしており、倍率をかけても透明のままで調整の余地がない
 
 メニュー系は Inkdrop が可読性のため不透明にしている。既定 100 では見た目を変えないが、
 統一感を優先したい利用者のために設定は開けてある。

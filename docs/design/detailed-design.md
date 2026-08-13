@@ -11,19 +11,19 @@
 ```json
 // package.json
 "configSchema": {
-  "sidebarOpacity":  { "type": "number", "default": 40,  "minimum": 0, "maximum": 200 },
-  "noteListOpacity": { "type": "number", "default": 40,  "minimum": 0, "maximum": 200 },
-  "editorOpacity":   { "type": "number", "default": 40,  "minimum": 0, "maximum": 200 },
-  "menuOpacity":     { "type": "number", "default": 100, "minimum": 0, "maximum": 200 }
+  "sidebarOpacity":  { "type": "number", "default": 40,  "minimum": 0, "maximum": 100 },
+  "noteListOpacity": { "type": "number", "default": 40,  "minimum": 0, "maximum": 100 },
+  "editorOpacity":   { "type": "number", "default": 40,  "minimum": 0, "maximum": 100 },
+  "menuOpacity":     { "type": "number", "default": 100, "minimum": 0, "maximum": 100 }
 }
 ```
 
 | 設定キー                          | 対象領域                             | 既定値 | 範囲   |
 | --------------------------------- | ------------------------------------ | ------ | ------ |
-| `transparency.sidebarOpacity`     | サイドバー                           | 40     | 0〜200 |
-| `transparency.noteListOpacity`    | ノート一覧                           | 40     | 0〜200 |
-| `transparency.editorOpacity`      | エディタ領域                         | 40     | 0〜200 |
-| `transparency.menuOpacity`        | メニュー・ドロップダウン・ドロワー   | 100    | 0〜200 |
+| `transparency.sidebarOpacity`     | サイドバー                           | 40     | 0〜100 |
+| `transparency.noteListOpacity`    | ノート一覧                           | 40     | 0〜100 |
+| `transparency.editorOpacity`      | エディタ領域                         | 40     | 0〜100 |
+| `transparency.menuOpacity`        | メニュー・ドロップダウン・ドロワー   | 100    | 0〜100 |
 
 いずれも **Inkdrop 既定の不透明度に対する倍率（%）** であり、100 で Inkdrop 既定と完全に一致する
 （＝透過を追加しない）。値を下げるほど Inkdrop 既定より透過が強くなる。
@@ -38,7 +38,10 @@
 一律の値で上書きすれば素の acrylic より不透明になって「上げるほど透ける」逆転が起きる。
 倍率であれば Inkdrop 側の調整を保ったまま、1つの値で両テーマを破綻なく動かせる。
 
-上限は 200 とし、算出後の不透明度は 100% で丸める。
+**上限は 100（＝Inkdrop 既定）とする。** 100 を超えて Inkdrop 既定より濃くする用途も考えられるが、
+実用域が 0〜60 に集中することが実機での確認で分かっており、100 を超える範囲はほぼ使われない。
+入力の可動域を実用域に集中させることを優先した。
+なお算出後の不透明度は、範囲外の設定値が残っていた場合に備えて 100% で丸める。
 
 **スキーマは `package.json` の `configSchema` で宣言しなければならない。**
 Inkdrop 6 の登録経路は2つあり、呼ばれるタイミングが異なる。
@@ -178,8 +181,8 @@ Inkdrop のコマンドがプラグインの公開インターフェースとな
 
 | 事象                             | 発生条件                                       | 挙動・対処                                                             |
 | -------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
-| 設定値が範囲外                   | 設定画面で 0〜200 以外を入力                   | Inkdrop の設定スキーマ（`minimum` / `maximum`）が入力段階で弾く         |
+| 設定値が範囲外                   | 設定画面で 0〜100 以外を入力                   | Inkdrop の設定スキーマ（`minimum` / `maximum`）が入力段階で弾く         |
 | 設定値が未設定                   | 初回起動時                                     | スキーマの既定値（主要3領域は 40、メニューは 100）が適用される          |
-| 算出結果が 100% を超える         | 倍率を 100 より大きくした場合                  | `Math.min(100, ...)` で丸める                                           |
+| 算出結果が 100% を超える         | 範囲外の設定値が残っていた場合                 | `Math.min(100, ...)` で丸める                                           |
 | サブウィンドウでの起動時適用     | メインウィンドウ以外でプラグインが読み込まれる | `inkdrop.isMainWindow` の判定により適用しない                           |
 | acrylic が無効                   | `core.mainWindow.acrylicEnabled` が false      | 背景は薄くなるがウィンドウ自体は不透明なため背後は見えない。`inkdrop.notifications.addWarning()` で有効化と再起動を促す |

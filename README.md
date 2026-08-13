@@ -28,7 +28,7 @@ Each setting is a **percentage of the opacity Inkdrop itself uses** for that are
 | Editor opacity | Editor area | 70% / 60% | 40 |
 | Menu and dropdown opacity | Menus, dropdowns, editor drawer | opaque | 100 |
 
-Because the values are relative, Inkdrop's own light and dark tuning is preserved: one number adjusts both themes sensibly. Opacity is capped at 100%, so values above that simply make an area fully solid — useful if you want the editor to stay readable while everything else goes translucent.
+Because the values are relative, Inkdrop's own light and dark tuning is preserved: one number adjusts both themes sensibly. Keeping the editor higher than the other areas is a good way to stay readable while the rest of the window goes translucent.
 
 Settings apply to the main window on startup, and a changed value is picked up when you return to the main window.
 

@@ -16,7 +16,7 @@
       "type": "number",
       "default": 40,
       "minimum": 0,
-      "maximum": 200
+      "maximum": 100
     },
     "noteListOpacity": {
       "title": "Note list opacity",
@@ -24,15 +24,15 @@
       "type": "number",
       "default": 40,
       "minimum": 0,
-      "maximum": 200
+      "maximum": 100
     },
     "editorOpacity": {
       "title": "Editor opacity",
-      "description": "The editor area's opacity as a percentage of Inkdrop's own. 100 adds no extra transparency, lower adds more. Raise this above the others if you want the text you are writing to stay easy to read.",
+      "description": "The editor area's opacity as a percentage of Inkdrop's own. 100 adds no extra transparency, lower adds more. Keep this higher than the other areas if you want the text you are writing to stay easy to read.",
       "type": "number",
       "default": 40,
       "minimum": 0,
-      "maximum": 200
+      "maximum": 100
     },
     "menuOpacity": {
       "title": "Menu and dropdown opacity",
@@ -40,7 +40,7 @@
       "type": "number",
       "default": 100,
       "minimum": 0,
-      "maximum": 200
+      "maximum": 100
     }
   },
   "repository": "https://github.com/ban367/inkdrop-transparency",

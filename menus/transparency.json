@@ -13,10 +13,6 @@
             {
               "label": "Deactivate",
               "command": "transparency:deactive"
-            },
-            {
-              "label": "Diagnose (temporary)",
-              "command": "transparency:diagnose"
             }
           ]
         }
